@@ -56,4 +56,21 @@ router.get("/fol/:folId/:folYear", async (req: Request, res: Response) => {
   }
 });
 
+router.post("/fols/notifiedUsers", async (req: Request, res: Response) => {
+  try {
+    const fol = await FOL.findById(req.body.id);
+    if (!fol) {
+      return res.status(HttpStatusCodes.NOT_FOUND).json({ message: "FOL not found" });
+    }
+    for (let userId in req.body.notifiedUsers) {
+      fol.notifiedUsers.push(req.body.notifiedUsers[userId]);
+    }
+    await fol.save();
+    return res.status(HttpStatusCodes.OK).json(fol);
+  } catch (err) {
+    console.error((err as Error).message);
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send("Server Error");
+  }
+});
+
 export default router;

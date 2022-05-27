@@ -41,6 +41,22 @@ const FOLSchema: Schema = new Schema({
     type: String,
     required: true,
   },
+  notifiedUsers: {
+    users: [{
+      userId: {
+        type: String,
+        required: true,
+      }
+    }]
+  },
+  viewsByUsers: {
+    users: [{
+      userId: {
+        type: String,
+        required: true,
+      }
+    }]
+  }
 });
 
 const FOL = model("FOL", FOLSchema);
