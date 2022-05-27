@@ -2,8 +2,8 @@ import axios from "axios";
 
 export async function sendPushNotifications(equipments) {
   try {
-    const foundUsers = await findUsersByEquipments(equipments)
-    const pushTokens = foundUsers.map(user => user.pushToken)
+    const foundUsers = await axios.get("https://brisk-notification-user.herokuapp.com/api/user/equipments", equipments)
+    const pushTokens = foundUsers.data.map(user => user.pushToken)
 
     const message = {
       to: pushTokens,
