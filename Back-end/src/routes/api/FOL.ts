@@ -1,15 +1,16 @@
 import FOL from "../../models/FOL";
 import HttpStatusCodes from "http-status-codes";
 import { Request, Response, Router } from 'express';
-import { findFolById, notifiedUsers, saveViewedUsers, viewedUsers } from "../../services/fol";
-
-import passport from 'passport';
+import { findFolById, notifiedUsers, notifiedUsersByEquipments, saveViewedUsers, viewedUsers } from "../../services/fol";
 import { verifyJwtToken } from "../../services/session";
 
 const router: Router = Router();
 
-router.get("/fols", passport.authenticate('bearer', { session: false }), async (req: Request, res: Response) => {
+router.get("/fols", async (req: Request, res: Response) => {
   try {
+    const user = await verifyJwtToken(req.headers.authorization)
+    if (!user) return res.status(401).send("Unauthorized");
+
     let fols;
     fols = await FOL.find({ ...(req.query.search && { keywords: { "$regex": req.query.search, "$options": "i" } }), ...(req.query.equipment && { equipment: req.query.equipment }) });
     if (!fols.length) {
@@ -22,8 +23,11 @@ router.get("/fols", passport.authenticate('bearer', { session: false }), async (
   }
 });
 
-router.get("/fols/category", passport.authenticate('bearer', { session: false }), async (req: Request, res: Response) => {
+router.get("/fols/category", async (req: Request, res: Response) => {
   try {
+    const user = await verifyJwtToken(req.headers.authorization)
+    if (!user) return res.status(401).send("Unauthorized");
+
     const fols = await FOL.find({ ...(req.query.search && { category: { "$regex": req.query.search, "$options": "i" } }), ...(req.query.equipment && { equipment: req.query.equipment }) });
     return res.status(HttpStatusCodes.OK).json(fols);
   } catch (err) {
@@ -68,6 +72,22 @@ router.get("/fols/notifiedUsers", async (req: Request, res: Response) => {
     const notifiedUser = await notifiedUsers(req.query.title);
 
     return res.status(HttpStatusCodes.OK).json(notifiedUser);
+  } catch (err) {
+    console.error((err as Error).message);
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send("Server Error");
+  }
+});
+
+
+router.get("/fols/viewedBy", async (req: Request, res: Response) => {
+  try {
+    const user = await verifyJwtToken(req.headers.authorization)
+    if (!user) return res.status(401).send("Unauthorized");
+
+    const folNotifiedUsersByEquipment = await notifiedUsersByEquipments(user.equipment);
+    console.log(folNotifiedUsersByEquipment);
+
+    return res.status(HttpStatusCodes.OK).json(folNotifiedUsersByEquipment);
   } catch (err) {
     console.error((err as Error).message);
     res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send("Server Error");
