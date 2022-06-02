@@ -81,10 +81,7 @@ router.get("/fols/notifiedUsers", async (req: Request, res: Response) => {
 
 router.get("/fols/viewedBy", async (req: Request, res: Response) => {
   try {
-    const user = await verifyJwtToken(req.headers.authorization)
-    if (!user) return res.status(401).send("Unauthorized");
-
-    const folNotifiedUsersByEquipment = await notifiedUsersByEquipments(user.equipment);
+    const folNotifiedUsersByEquipment = await notifiedUsersByEquipments(req.query.equipment);
     console.log(folNotifiedUsersByEquipment);
 
     return res.status(HttpStatusCodes.OK).json(folNotifiedUsersByEquipment);
