@@ -52,10 +52,8 @@ export async function viewedUsers(folTitle) {
 
 export async function notifiedUsersByEquipments(equipments) {
   equipments = equipments.split(",")
-  console.log(equipments);
-
   let folCount = 0;
-  for (let i = 0; i < equipments.length; i++) {
+  for (let i = 0; i <= equipments.length; i++) {
     await FOL.countDocuments({ equipment: equipments[i] }, (err, count) => {
       folCount = count + folCount;
     });
