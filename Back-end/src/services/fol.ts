@@ -32,6 +32,12 @@ export async function notifiedUsers(folTitle) {
   return usersIds;
 }
 
+export async function listAllFols() {
+  const fols: IFol = await FOL.find();
+
+  return fols;
+}
+
 export async function saveViewedUsers(folTitle: string, userId: string) {
   const fol: IFolDocument = await FOL.findOne({ title: folTitle });
   if (userId! in fol.viewsByUsers.users) {
@@ -55,12 +61,12 @@ export async function notifiedUsersByEquipments(equipments) {
   console.log(equipments);
 
   let folCount = 0;
-  for (let i = 0; i < equipments.length; i++) {
-    await FOL.countDocuments({ equipment: equipments[i] }, (err, count) => {
-      folCount = count + folCount;
-    });
+  for (let i = 0; i <= equipments.length; i++) {
+    await FOL.countDocuments({ equipment: equipments[i] }, function (err, count) {
+      console.log(count);
+      folCount = folCount + count
+    })
   }
-
 
   return folCount;
 }

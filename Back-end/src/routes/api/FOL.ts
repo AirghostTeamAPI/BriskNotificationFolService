@@ -1,7 +1,7 @@
 import FOL from "../../models/FOL";
 import HttpStatusCodes from "http-status-codes";
 import { Request, Response, Router } from 'express';
-import { findFolById, notifiedUsers, notifiedUsersByEquipments, saveViewedUsers, viewedUsers } from "../../services/fol";
+import { findFolById, listAllFols, notifiedUsers, notifiedUsersByEquipments, saveViewedUsers, viewedUsers } from "../../services/fol";
 import { verifyJwtToken } from "../../services/session";
 
 const router: Router = Router();
@@ -66,9 +66,6 @@ router.get("/fol/:folId/:folYear", async (req: Request, res: Response) => {
 
 router.get("/fols/notifiedUsers", async (req: Request, res: Response) => {
   try {
-    const user = await verifyJwtToken(req.headers.authorization)
-    if (!user) return res.status(401).send("Unauthorized");
-
     const notifiedUser = await notifiedUsers(req.query.title);
 
     return res.status(HttpStatusCodes.OK).json(notifiedUser);
@@ -78,11 +75,20 @@ router.get("/fols/notifiedUsers", async (req: Request, res: Response) => {
   }
 });
 
+router.get("/fols", async (req: Request, res: Response) => {
+  try {
+    const fols = await listAllFols()
+
+    return res.status(HttpStatusCodes.OK).json(fols);
+  } catch (err) {
+    console.error((err as Error).message);
+    res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send("Server Error");
+  }
+});
 
 router.get("/fols/viewedBy", async (req: Request, res: Response) => {
   try {
     const folNotifiedUsersByEquipment = await notifiedUsersByEquipments(req.query.equipment);
-    console.log(folNotifiedUsersByEquipment);
 
     return res.status(HttpStatusCodes.OK).json(folNotifiedUsersByEquipment);
   } catch (err) {
@@ -93,9 +99,6 @@ router.get("/fols/viewedBy", async (req: Request, res: Response) => {
 
 router.get("/fols/viewedUsers", async (req: Request, res: Response) => {
   try {
-    const user = await verifyJwtToken(req.headers.authorization)
-    if (!user) return res.status(401).send("Unauthorized");
-
     const viewedUser = await viewedUsers(req.query.title);
 
     return res.status(HttpStatusCodes.OK).json(viewedUser);
