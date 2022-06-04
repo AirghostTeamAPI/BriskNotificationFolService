@@ -1,8 +1,11 @@
 import axios from "axios";
+import { saveNotifiedUsers } from "./fol";
 
-export async function sendPushNotifications(equipments) {
+export async function sendPushNotifications(folTitle: string, equipments: [string]) {
   try {
-    const foundUsers = await axios.get("https://brisk-notification-user.herokuapp.com/api/user/equipments", equipments)
+    const foundUsers = await axios.post("http://localhost:5001/api/user/equipments", { equipments })
+
+    saveNotifiedUsers(folTitle, foundUsers.data);
     const pushTokens = foundUsers.data.map(user => user.pushToken)
 
     const message = {
@@ -12,7 +15,7 @@ export async function sendPushNotifications(equipments) {
       body: `Nova fol sobre seu veiculo`,
     };
 
-    await axios.post('https://exp.host/api/v2/push/send', {
+    await axios.post('https://exp.host/--/api/v2/push/send', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -23,6 +26,9 @@ export async function sendPushNotifications(equipments) {
       body: JSON.stringify(message),
     });
   } catch (error) {
-    console.log(error)
+    /*if (error instanceof AxiosError) {
+      console.log(error.response);
+    }
+    else console.log(error)*/
   }
 }

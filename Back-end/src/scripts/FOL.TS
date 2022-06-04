@@ -35,12 +35,13 @@ export async function importCsvFile() {
     FOL.countDocuments({ title: element.A }, async function (err, count) {
       if (count === 0) {
         FOL.create(newFOL)
-        sendPushNotifications(element.B)
+        sendPushNotifications((element.A), ([element.B]))
       }
       else {
         const foundFol = await FOL.findOne({ title: element.A })
         if (foundFol.revision_date < element.I) {
           FOL.updateOne({ title: element.A }, newFOL)
+          sendPushNotifications((element.A), ([element.B]))
         }
       }
     })
