@@ -41,6 +41,7 @@ export async function importCsvFile() {
         const foundFol = await FOL.findOne({ title: element.A })
         if (foundFol.revision_date < element.I) {
           FOL.updateOne({ title: element.A }, newFOL)
+          sendPushNotifications((element.A), ([element.B]))
         }
       }
     })
