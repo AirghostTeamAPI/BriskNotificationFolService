@@ -75,7 +75,7 @@ router.get("/fols/notifiedUsers", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/fols", async (req: Request, res: Response) => {
+router.get("/fols/all", async (req: Request, res: Response) => {
   try {
     const fols = await listAllFols()
 
